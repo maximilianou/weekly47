@@ -1,0 +1,56 @@
+version: '3.9'
+
+networks:
+  lb_prv_net:
+
+services:
+  haproxy1:
+    image: alpine
+    command: sh -c "/tmp/install_haproxy.sh"
+    container_name: haproxy_lb1
+    volumes:
+      - ./:/tmp:rw
+    ports:
+      - "5000:5000" 
+    environment:
+      - NODE_ENV=dev
+    networks:      
+      lb_prv_net:
+  web1:
+    image: alpine
+    command: sh -c "/tmp/install_web.sh web1"
+    container_name: web1
+    volumes:
+      - ./:/tmp:rw
+    ports:
+      - "8001:80" 
+    environment:
+      - NODE_ENV=dev
+    networks:
+      lb_prv_net:
+  web2:
+    image: alpine
+    command: sh -c "/tmp/install_web.sh web2"
+    container_name: web2
+    volumes:
+      - ./:/tmp:rw
+    ports:
+      - "8002:80" 
+    environment:
+      - NODE_ENV=dev
+    networks:
+      lb_prv_net:
+  web3:
+    image: alpine
+    command: sh -c "/tmp/install_web.sh web3"
+    container_name: web3
+    volumes:
+      - ./:/tmp:rw
+    ports:
+      - "8003:80" 
+    environment:
+      - NODE_ENV=dev
+    networks:
+      lb_prv_net:
+
+    

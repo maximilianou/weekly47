@@ -1,0 +1,9 @@
+FROM node:16-alpine
+RUN npm set strict-ssl false
+WORKDIR /ui
+COPY package.json ./
+RUN npm i
+COPY . .
+COPY ./docs ./docs
+EXPOSE 3000
+CMD [ "npm", "run", "start" ]

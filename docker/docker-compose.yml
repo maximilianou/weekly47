@@ -1,0 +1,104 @@
+version: '3.9'
+
+networks:
+  app_prv_net:
+
+services:
+
+  ui:
+    image: node:alpine
+    command: sh -c "npm install && npm run start"
+    working_dir: /ui
+    container_name: app_ui
+    volumes:
+      - ../app/ui:/ui
+      - ../app/ui/node_modules:/ui/node_modules
+    ports:
+      - "4500:3000" 
+      - "49153:49153"
+    environment:
+      - NODE_ENV=dev
+    networks:
+      - app_prv_net
+
+  api:
+    image: node:alpine
+    command: sh -c "npm install && npm run dev:nodemon"
+    working_dir: /api
+    container_name: app_api
+    volumes:
+      - ../app/api:/api
+      - ../app/api/node_modules:/api/node_modules
+    ports:
+      - "4000:4000" 
+      - "49155:49153"
+    environment:
+      - NODE_ENV=dev
+    networks:
+      - app_prv_net
+
+  neo4j:
+    image: neo4j:latest
+    container_name: app_neo4j
+    ports: 
+      - 7474:7474
+      - 7687:7687
+    environment:
+      - NEO4J_AUTH=neo4j/s3cr3t
+#    volumes:
+#      - ./neo4j/data:/data
+#      - ./neo4j/logs:/logs
+    networks:
+      - app_prv_net
+
+#
+#  db:
+#    image: postgres:13-alpine
+#    #restart: always
+#    healthcheck:
+#      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
+#      timeout: 45s
+#      interval: 10s
+#      retries: 10    
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: example
+#      APP_DB_USER: dev_user
+#      APP_DB_PASS: dev_user
+#      APP_DB_NAME: application
+#    ports:
+#      - "5432:5432"
+##    logging:
+##      options:
+##        max-size: 10m
+##        max-file: "3"
+#    volumes: 
+#      - ./data:/var/lib/postgresql/data
+#      - ./db:/docker-entrypoint-initdb.d/
+#      - ./sql:/sql
+##      # copy the sql script to fill tables
+##      - ./sql/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+#    networks:
+#      - app_prv_net  
+
+  
+
+
+#  registry:
+#    restart: always
+#    image: registry:2
+#    ports:
+#      - 5000:5000
+#    environment:
+#      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+#      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+#      REGISTRY_AUTH: htpasswd
+#      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+#      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+#    volumes:
+#      - /path/data:/var/lib/registry
+#      - /path/certs:/certs
+#      - /path/auth:/auth
+
+    
+
