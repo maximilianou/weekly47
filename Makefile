@@ -19,6 +19,12 @@ step47_1400 dmarket_create:
 	cd dapp/dmarket && npm i -D tailwindcss@latest postcss@latest autoprefixer@latest
 	cd dapp/dmarket && npx tailwindcss init -p
 
+step47_1401 dmarket_hardhat_init:
+	cd dapp/dmarket && npx hardhat
+
+step47_1402 dmarket_hardhat_secret:
+	touch dapp/dmarket/.secret
+
 step47_1499 dmarket_clean:
 	cd dapp && rm -rf dmarket
 
