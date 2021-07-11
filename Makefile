@@ -22,6 +22,9 @@ step47_1400 dmarket_create:
 step47_1401 dmarket_hardhat_init:
 	cd dapp/dmarket && npx hardhat
 
+step47_1402 dmarket_hardhat_secret:
+	touch dapp/dmarket/.secret
+
 step47_1499 dmarket_clean:
 	cd dapp && rm -rf dmarket
 
