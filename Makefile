@@ -11,26 +11,36 @@ step00 view-hostname:
 	@echo $(servers-exec-cmd)
 	@echo '$(servers-exec-usr-id)'
 
+step47_1400 dmarket_create:
+	cd dapp && npx create-next-app dmarket
+	cd dapp/dmarket && npm i ethers hardhat @nomiclabs/hardhat-waffle
+	cd dapp/dmarket && npm i ethereum-waffle chai @nomiclabs/hardhat-ethers
+	cd dapp/dmarket && npm i web3modal @openzeppelin/contracts ipfs-http-client axios
+	cd dapp/dmarket && npm i -D tailwindcss@latest postcss@latest autoprefixer@latest
+	cd dapp/dmarket && npx tailwindcss init -p
 
-step46_1301 denochat_install:
-	curl -fsSL https://deno.land/x/install/install.sh | sh	
-	deno --version
+step47_1499 dmarket_clean:
+	cd dapp && rm -rf dmarket
 
-step46_1302 denochat_create:
-	mkdir -p denochat/api 
-
-step46_1303 denochat_ui:
-	deno install -A -f --no-check -n fresh https://raw.githubusercontent.com/lucacasonato/fresh/main/cli.ts
-	cd denochat && fresh init ui
-
-step46_1304 denochat_deployctl_install:
-	deno install --allow-read --allow-write --allow-env --allow-net --allow-run --no-check -r -f https://deno.land/x/deploy/deployctl.ts
-
-step46_1305 denochat_deployctl_run:
-	cd denochat/ui && deployctl run --no-check --watch main.ts
-
-step46_1300 deno_clean:
-	rm -rf denochat
+##step46_1301 denochat_install:
+##	curl -fsSL https://deno.land/x/install/install.sh | sh	
+##	deno --version
+##
+##step46_1302 denochat_create:
+##	mkdir -p denochat/api 
+##
+##step46_1303 denochat_ui:
+##	deno install -A -f --no-check -n fresh https://raw.githubusercontent.com/lucacasonato/fresh/main/cli.ts
+##	cd denochat && fresh init ui
+##
+##step46_1304 denochat_deployctl_install:
+##	deno install --allow-read --allow-write --allow-env --allow-net --allow-run --no-check -r -f https://deno.land/x/deploy/deployctl.ts
+##
+##step46_1305 denochat_deployctl_run:
+##	cd denochat/ui && deployctl run --no-check --watch main.ts
+##
+##step46_1300 deno_clean:
+##	rm -rf denochat
 
 #####################################################
 ## Functional Programming Typescript / Javascript
