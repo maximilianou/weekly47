@@ -25,6 +25,9 @@ step47_1401 dmarket_hardhat_init:
 step47_1402 dmarket_hardhat_secret:
 	touch dapp/dmarket/.secret
 
+step47_1403 dmarket_hardhat_test:
+	cd dapp/dmarket && npx hardhat test
+
 step47_1499 dmarket_clean:
 	cd dapp && rm -rf dmarket
 
