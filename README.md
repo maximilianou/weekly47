@@ -579,3 +579,14 @@ export default Home = () => {
 ```
 
 ##### create dashboard
+
+##### Running the project
+
+##### spin up a local network
+- Makefile
+```yaml
+step47_1404 dmarket_hardhat_node:
+	cd dapp/dmarket && npx hardhat node
+```
+*( this will create a local network with 19 accounts )*
+
