@@ -582,11 +582,105 @@ export default Home = () => {
 
 ##### Running the project
 
-##### spin up a local network
+##### hardhat spin up a local network
 - Makefile
 ```yaml
 step47_1404 dmarket_hardhat_node:
 	cd dapp/dmarket && npx hardhat node
 ```
 *( this will create a local network with 19 accounts )*
+
+- output 1 ( local env )
+```yaml
+:~/projects/weekly47$ make dmarket_hardhat_node
+cd dapp/dmarket && npx hardhat node
+Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+
+Accounts
+========
+Account #0: 0xf39.............. (10000 ETH)
+Private Key: 0xac0....................
+
+Account #1: 0x709.................. (10000 ETH)
+Private Key: 0x59c...............
+
+Account #2: 0x3c4.................. (10000 ETH)
+Private Key: 0x5de..................
+
+Account #3: 0x90................... (10000 ETH)
+Private Key: 0x7c...................
+...
+```
+##### hardhat deploy a local network
+
+- Makefile
+```yaml
+step47_1405 dmarket_hardhat_deploy_local:
+	cd dapp/dmarket && npx hardhat run scripts/deploy.js --network localhost
+```
+
+- output 2 ( local env ) the address of the contracts
+```yaml
+:~/projects/weekly47$ make dmarket_hardhat_deploy_local
+cd dapp/dmarket && npx hardhat run scripts/deploy.js --network localhost
+Compiling 16 files with 0.8.4
+Compilation finished successfully
+nftMarket deployed to:  0x5F..................
+nft deployed to:  0xe7....................
+```
+- output 1 ( local env )
+```yaml
+...
+hardhat_addCompilationResult
+web3_clientVersion
+eth_chainId
+eth_accounts
+eth_blockNumber
+eth_chainId (2)
+eth_estimateGas
+eth_gasPrice
+eth_sendTransaction
+  Contract deployment: NFTMarket
+  Contract address:    0x5fb....................
+  Transaction:         0x67b....................
+  From:                0xf39....................
+  Value:               0 ETH
+  Gas used:            850147 of 850147
+  Block #1:            0xfbd....................
+eth_chainId
+eth_getTransactionByHash
+eth_chainId
+eth_getTransactionReceipt
+eth_accounts
+eth_chainId
+eth_estimateGas
+eth_sendTransaction
+  Contract deployment: NFT
+  Contract address:    0xe7f....................
+  Transaction:         0x1a8....................
+  From:                0xf39....................
+  Value:               0 ETH
+  Gas used:            1389044 of 1389044
+  Block #2:            0x7ac....................
+eth_chainId
+eth_getTransactionByHash
+eth_chainId
+eth_getTransactionReceipt
+...
+```
+##### add config.js in root folder with contract address ( local env )
+
+- dapp/dmarket/config.js
+```ts
+export const nftmarketaddress = '0x5Fb.....................';
+export const nftaddress = '0xe7f.....................';
+```
+
+##### Metamask Import Account
+- Switch Metamask wallet to localhost 8545
+[![metamask wallet localhost](https://github.com/maximilianou/weekly47/share/metamasklocalhost202107141319.png)](https://github.com/maximilianou/weekly47/share/metamasklocalhost202107141319.png)
+
+
+
+
 

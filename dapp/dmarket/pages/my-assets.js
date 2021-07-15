@@ -6,7 +6,7 @@ import Web3Modal from 'web3modal';
 import { nftmarketaddress, nftaddress } from '../config';
 import Market from '../artifacts/contracts/Market.sol/NFTMarket.json';
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
-export default Home = () => {
+export default function MyAssets(){
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState('not-loaded');
   useEffect( () => {
@@ -60,6 +60,3 @@ export default Home = () => {
     </div>
   );
 }
-
-
-

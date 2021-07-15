@@ -10,7 +10,7 @@ import {
 } from '../config';
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
 import Market from '../artifacts/contracts/Market.sol/NFTMarket.json';
-export default Home = () => {
+export default function CreateItem(){
   const [fileUrl, setFileUrl] = useState(null);
   const [formInput, updateFormInput] = useState({ price: '', name: '', description: ''});
   const router = useRouter();
@@ -88,6 +88,4 @@ export default Home = () => {
     </div>
   );
 }
-
-
 
