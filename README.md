@@ -357,3 +357,330 @@ contract NFTMarket is ReentrancyGuard {
 }
 ```
 
+#### dapp dmarket create feat-1410-dapp-ui
+
+- dapp/dmarket/pages/_app.js
+```jsx
+/* pages/_app.js */
+import '../styles/globals.css'
+const MyApp = ({ Component, pageProps }) => {
+  return (
+    <>
+      <nav className='border-b p-6'>
+        <p className='text-4xl font-bold'>Metaverse Marketplace</p>
+        <div className='flex mt-4'>
+        <Link href='/'>
+            <a className='mr-4 text-pink-500'>Home</a>
+          </Link>
+          <Link href='/create-item'>
+            <a className='mr-6 text-pink-500'>Sell Digital Asset</a>
+          </Link>
+          <Link href='/my-assets'>
+            <a className='mr-6 text-pink-500'>My Digital Asset</a>
+          </Link>
+          <Link href='/creator-dashboard'>
+            <a className='mr-6 text-pink-500'>Creator Dashboard</a>
+          </Link>          
+        </div>
+      </nav>
+      <Component {...pageProps} /> 
+    </>
+  )
+}
+export default MyApp
+```
+
+- dapp/dmarket/pages/index.js
+```jsx
+/* pages/index.js */
+import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Web3Modal from 'web3modal';
+import {
+  nftaddress, nftmarketaddress
+} from '../config';
+import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
+import Market from '../artifacts/contracts/Market.sol/NFTMarket.json';
+export default Home = () => {
+  const [nfts, setNfts] = useState([]);
+  const [loadingState, setLoadingState] = useState('not-loaded');
+  useEffect( () => {
+    loadNFTs();
+  }, []);
+  const loadNFTs = async () => {
+    /* create a generic provider  and query for unsold  market items */
+    const provider = new ethers.providers.JsonRpcProvider();
+    const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
+    const marketContract  = new ethers.Contract(nftmarketaddress, Market.abi, provider);
+    const data = await marketContract.fetchMarketItems();
+    /* map over items returned from smart contract 
+       and format them well as fetch their token metadata */
+    const items = await Promise.all( data.map( async (i) => {
+      const tokenUri = await tokenContract.tokenURI(i.tokenId);
+      const meta = await axios.get(tokenUri);
+      let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
+      let item = {
+        price,
+        tokenId: i.tokenId.toNumber(),
+        seller: i.seller,
+        owner: i.owner,
+        image: meta.data.image,
+        name: meta.data.name,
+        description: meta.data.description
+      };
+      return item;
+    } ));
+    setNfts(items);
+    setLoadingState('loaded');
+  } 
+  const buyNft = async () => {
+    /* needs the user to sign the transaction, so will use Web3Provider and sign it */
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.provider.Web3Provider(connection);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(nftmarketaddress, Market.abi, signer);
+    /* user will be prompted to pay  the asking process  to complete the transaction */
+    const price = ethers.utils.parseUnits( nft.price.toString(), 'ether');
+    const transaction = await contract.createMarketPlace(nftaddress, nft.tokenId, {
+      value: price
+    });
+    await transaction.wait();
+    loadNFTs();
+  }
+  if( loadingState === 'loaded' && !nft.length ) 
+    return (<h1 className='px-20 py-10 text-3xl'>No items on marketplace</h1>);  
+  return (
+    <div className='flex justify-center'>
+      <div className='px-4' style={{ maxWidth: '1600px'}}>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
+          {
+            nfts.map( (nft, i) => (
+              <div key={i} className='border shadow rounded-xl overflow-hidden'>
+                <img src={nft.image} />
+                <div className='p-4' >
+                  <p style={{ height: '64px' }} className='text-2xl font-semibold'>{nft.name}</p>
+                  <div style={{ height: '70px', overflow: 'hidden'}}>
+                    <p className='text-gray-400'>{nft.description}</p>
+                  </div>
+                </div>
+                <div className='p-4 bg-black'>
+                  <p className='text-2xl mb-4 font-bold text-white'>{nft.price} ETH</p>
+                  <button className='w-full bg-pink-500 text-white font-bold py-2 px-2 rounded'
+                    onClick={() => buyNft(nft)}>
+                    Buy
+                  </button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+##### create and listing digital assets 
+
+- dapp/dmarket/pages/create-item.js
+```jsx
+/* pages/create-item.js */
+import { useState } from 'react';
+import { ethers }  from 'ethers';
+import { create as ipfsHttpClient} from 'ipfs-http-client';
+import { useRouter } from 'next/router';
+import Web3Modal from 'web3modal';
+const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
+import {
+  nftaddress, nftmarketaddress
+} from '../config';
+import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
+import Market from '../artifacts/contracts/Market.sol/NFTMarket.json';
+export default Home = () => {
+  const [fileUrl, setFileUrl] = useState(null);
+  const [formInput, updateFormInput] = useState({ price: '', name: '', description: ''});
+  const router = useRouter();
+  const onChange = async (e) => {
+    const file = e.target.files[0];
+    try{
+      const added = await client.add(file, 
+        { progress: (prog) => console.log(`received: ${prog}`) });
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+      setFileUrl(url);
+    }catch(error){
+      console.log(`Error uploading file: `, error);
+    }
+  };
+  const createMarket = async () => {
+    const { name, description, price } = formInput;
+    if( !name || !description || !price || !fileUrl ) return;
+    /* first, upload to ipfs */
+    const data = JSON.stringify({
+      name, description, image: fileUrl
+    });
+    try{
+      const added = await client.add(data);
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+      /* after file is uploaded in ipfs, pass the url to save into Polygon */
+      createSale(url);
+    }catch(error){
+      console.log(`Error uploading file: `, error);
+    }
+  };
+  const createSale = async (url) => {
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+    /* and next, create the item */
+    let contract = new ethers.Contract(nftaddress, NFT.abi, signer);
+    let transaction = await contract.createToken(url);
+    let tx = await transaction.wait();
+    let event = tx.events[0];
+    let value = event.args[2];
+    let tokenId = value.toNumber();
+    const price = ethers.utils.parseUnits( formInput.price, 'ether');
+    /* then list the item for sale on the marketplace */
+    contract = new ethers.Contract(nftmarketaddress, tokenId, price, { value: listingPrice });
+    await transaction.wait();
+    router.push('/');
+  };
+  return (
+    <div className='flex justify-center'>
+      <div className='w-1/2 flex flex-col pb-12'>
+        <input placeholder='Asset Name'
+               className='mt-8 border rounded p-4'
+          onChange={ e => updateFormInput({...formInput, name: e.target.value})} />
+        <textarea placeholder='Asset Description'
+          className='mt-2 border rounded p-4'
+          onChange={ e => updateFormInput({...formInput, description: e.target.value})} />
+        <input placeholder='Asset Price in Eth'
+          className='mt-2 border rounded p-4'
+          onChange={ e => updateFormInput({...formInput, price: e.target.value}) } />
+        <input type='file' 
+          name='Asset'
+          className='my-4'
+          onChange={onChange} />
+        {
+          fileUrl && (
+            <img className='rounded mt-4' width='350' src={fileUrl} />
+          )
+        }
+        <button
+          onClick={createMarket} 
+          className='font-bold mt-4 bg-ping-500 text-white rounded p-4 shadow-lg'
+          >Create Digital Asset</button>
+      </div>
+    </div>
+  );
+}
+```
+
+##### create dashboard
+
+##### Running the project
+
+##### hardhat spin up a local network
+- Makefile
+```yaml
+step47_1404 dmarket_hardhat_node:
+	cd dapp/dmarket && npx hardhat node
+```
+*( this will create a local network with 19 accounts )*
+
+- output 1 ( local env )
+```yaml
+:~/projects/weekly47$ make dmarket_hardhat_node
+cd dapp/dmarket && npx hardhat node
+Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+
+Accounts
+========
+Account #0: 0xf39.............. (10000 ETH)
+Private Key: 0xac0....................
+
+Account #1: 0x709.................. (10000 ETH)
+Private Key: 0x59c...............
+
+Account #2: 0x3c4.................. (10000 ETH)
+Private Key: 0x5de..................
+
+Account #3: 0x90................... (10000 ETH)
+Private Key: 0x7c...................
+...
+```
+##### hardhat deploy a local network
+
+- Makefile
+```yaml
+step47_1405 dmarket_hardhat_deploy_local:
+	cd dapp/dmarket && npx hardhat run scripts/deploy.js --network localhost
+```
+
+- output 2 ( local env ) the address of the contracts
+```yaml
+:~/projects/weekly47$ make dmarket_hardhat_deploy_local
+cd dapp/dmarket && npx hardhat run scripts/deploy.js --network localhost
+Compiling 16 files with 0.8.4
+Compilation finished successfully
+nftMarket deployed to:  0x5F..................
+nft deployed to:  0xe7....................
+```
+- output 1 ( local env )
+```yaml
+...
+hardhat_addCompilationResult
+web3_clientVersion
+eth_chainId
+eth_accounts
+eth_blockNumber
+eth_chainId (2)
+eth_estimateGas
+eth_gasPrice
+eth_sendTransaction
+  Contract deployment: NFTMarket
+  Contract address:    0x5fb....................
+  Transaction:         0x67b....................
+  From:                0xf39....................
+  Value:               0 ETH
+  Gas used:            850147 of 850147
+  Block #1:            0xfbd....................
+eth_chainId
+eth_getTransactionByHash
+eth_chainId
+eth_getTransactionReceipt
+eth_accounts
+eth_chainId
+eth_estimateGas
+eth_sendTransaction
+  Contract deployment: NFT
+  Contract address:    0xe7f....................
+  Transaction:         0x1a8....................
+  From:                0xf39....................
+  Value:               0 ETH
+  Gas used:            1389044 of 1389044
+  Block #2:            0x7ac....................
+eth_chainId
+eth_getTransactionByHash
+eth_chainId
+eth_getTransactionReceipt
+...
+```
+##### add config.js in root folder with contract address ( local env )
+
+- dapp/dmarket/config.js
+```ts
+export const nftmarketaddress = '0x5Fb.....................';
+export const nftaddress = '0xe7f.....................';
+```
+
+##### Metamask Import Account
+- Switch Metamask wallet to localhost 8545
+[![metamask wallet localhost](https://github.com/maximilianou/weekly47/share/metamasklocalhost202107141319.png)](https://github.com/maximilianou/weekly47/share/metamasklocalhost202107141319.png)
+
+
+
+
+
