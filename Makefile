@@ -40,6 +40,23 @@ step47_1406 dmarket_dev_test:
 step47_1499 dmarket_clean:
 	cd dapp && rm -rf dmarket
 
+step47_1520 nftmarket_network_start:
+	cd dapp/nft-marketplace && npx hardhat node
+
+step47_1521 nftmarket_token_deploy_localhost:
+	cd dapp/nft-marketplace && npx hardhat run scripts/deploy.js --network localhost
+
+step47_1523 nftmarket_run_dev:
+	cd dapp/nft-marketplace && npm run dev
+
+step47_1524 nftmarket_on_your_browser:
+	echo '1. Open your Browser in http://localhost:3000'
+	echo '2. Install Metamask on your browser'
+	echo '3. Import in Metamask 2 wallet, take the private key from the initial network running'
+	echo '4. Add a new NFT over the Site, Using the Metamask Wallet Account A'
+	echo '5. Buy the NFT, using the Metamask wallet account B'
+	echo '6. Verify how it goes!'
+
 ##step46_1301 denochat_install:
 ##	curl -fsSL https://deno.land/x/install/install.sh | sh	
 ##	deno --version
