@@ -424,3 +424,7 @@ step180 kubectl-watch-get-pods:
 
 step190 kubectl-delete-all:
 	kubectl delete all --all # delete all resources in all namespaces
+
+step9999 friend-question:
+	docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp openjdk:alpine javac share/Main.java
+	docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp openjdk:alpine java share.Main
