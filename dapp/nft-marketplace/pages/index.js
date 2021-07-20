@@ -4,7 +4,7 @@ import axios from 'axios';
 import Web3Modal from 'web3modal';
 import {
   nftaddress, nftmarketaddress
-} from '../.config';
+} from '../.config.js';
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
 import Market from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json';
 export default function Home() {
@@ -58,7 +58,7 @@ export default function Home() {
       <div className='px-4' style={{ maxWidth: '1600px' }}>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
           {
-            nfts.map( (nft, i) => {
+            nfts.map( (nft, i) => (
               <div key={i} className='border shadow rounded-xl overflow-hidden'>
                 <img src={nft.image} />
                 <div className='p-4'>
@@ -75,9 +75,9 @@ export default function Home() {
                     onClick={() => buyNft(nft)} >Buy</button>
                 </div>
               </div>
-            })
+            ))
           }
-        </div>
+        </div>        
       </div>
     </div>
   )
