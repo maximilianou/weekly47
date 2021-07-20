@@ -455,7 +455,7 @@ describe("NFTMarket", function () {
 });
 ```
 - pages/_app.js
-```ts
+```tsx
 import '../styles/globals.css';
 import Link from 'next/link';
 function MyApp({ Component, pageProps }) {
@@ -494,7 +494,7 @@ export default MyApp
 ```
 
 - pages/index.js
-```ts
+```tsx
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -582,7 +582,7 @@ export default function Home() {
 ```
 
 - pages/create-item.js
-```ts
+```tsx
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { create as ipfsHttpClient } from 'ipfs-http-client';
@@ -687,7 +687,7 @@ export default function CreateItem(){
 }
 ```
 - pages/my-assets.js
-```ts
+```tsx
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -753,7 +753,7 @@ export default function MyAssets(){
 }
 ```
 - pages/creator-dashboard.js
-```ts
+```tsx
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
