@@ -1,5 +1,5 @@
 # weekly47
-## learning graphql
+## learning 
 
 ## baby steps: learning smart contract, blockchains, solidity, nextjs, tailwind, ehters, hardhat..
 ### Building a digital marketplace with Next.js, Tailwind, Solidity, Hardhat, Ethers.js, IPFS, and Polygon
